@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeDrop - Blood Donation Platform</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Custom Colors */
+        :root {
+            --primary-red: #dc2626;
+            --dark-red: #b91c1c;
+            --secondary-gray: #4b5563;
+            --light-gray: #f7f7f7;
+            --border-gray: #e5e7eb;
+            --green-500: #10b981;
+            --yellow-500: #f59e0b;
+            --blue-500: #3b82f6;
+        }
+
+        /* Utility Classes */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        .text-primary-red { color: var(--primary-red); }
+        .bg-primary-red { background-color: var(--primary-red); }
+        .hover-bg-red:hover { background-color: var(--dark-red); }
+        .text-secondary-gray { color: var(--secondary-gray); }
+        .text-o-plus { color: var(--yellow-500); }
+        .border-primary-red { border-color: var(--primary-red); }
+        .rounded-lg { border-radius: 8px; }
+        .rounded-xl { border-radius: 12px; }
+        .rounded-full { border-radius: 9999px; }
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); }
+        .transition { transition: all 0.3s ease; }
+        .transform { transition: transform 0.2s ease; }
+        .hover-scale:hover { transform: scale(1.05); }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background-color: var(--primary-red);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: var(--dark-red);
+            transform: scale(1.05);
+        }
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: var(--secondary-gray);
+            border: 1px solid #d1d5db;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+            transform: scale(1.05);
+        }
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        /* Layout */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .space-x-4 > * + * { margin-left: 16px; }
+        .space-y-4 > * + * { margin-top: 16px; }
+        .space-y-6 > * + * { margin-top: 24px; }
+        .space-y-8 > * + * { margin-top: 32px; }
+        .py-4 { padding-top: 16px; padding-bottom: 16px; }
+        .py-8 { padding-top: 32px; padding-bottom: 32px; }
+        .py-10 { padding-top: 40px; padding-bottom: 40px; }
+        .px-4 { padding-left: 16px; padding-right: 16px; }
+        .px-8 { padding-left: 32px; padding-right: 32px; }
+        .p-4 { padding: 16px; }
+        .p-6 { padding: 24px; }
+        .p-8 { padding: 32px; }
+        .mt-4 { margin-top: 16px; }
+        .mt-6 { margin-top: 24px; }
+        .mt-8 { margin-top: 32px; }
+        .mt-10 { margin-top: 40px; }
+        .mb-4 { margin-bottom: 16px; }
+        .mb-6 { margin-bottom: 24px; }
+        .mb-8 { margin-bottom: 32px; }
+        .hidden { display: none; }
+
+        /* Typography */
+        .text-sm { font-size: 0.875rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .text-3xl { font-size: 1.875rem; }
+        .text-4xl { font-size: 2.25rem; }
+        .text-5xl { font-size: 3rem; }
+        .font-bold { font-weight: 700; }
+        .font-extrabold { font-weight: 800; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .uppercase { text-transform: uppercase; }
+        .tracking-wider { letter-spacing: 0.1em; }
+        .leading-tight { line-height: 1.2; }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            gap: 24px;
+        }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        @media (min-width: 768px) {
+            .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .md\:flex-row { flex-direction: row; }
+            .md\:w-1\/2 { width: 50%; }
+            .md\:col-span-1 { grid-column: span 1 / span 1; }
+            .md\:col-span-2 { grid-column: span 2 / span 2; }
+            .md\:col-span-3 { grid-column: span 3 / span 3; }
+        }
+
+        /* Forms */
+        input, select, button {
+            font-family: inherit;
+            font-size: 100%;
+            line-height: 1.15;
+            margin: 0;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            outline: none;
+        }
+        input:focus, select:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        /* Navigation */
+        header {
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        nav a {
+            padding: 8px 0;
+            font-weight: 500;
+            color: var(--secondary-gray);
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        nav a:hover {
+            color: var(--primary-red);
+        }
+        nav a.active {
+            color: var(--primary-red);
+            font-weight: bold;
+            border-bottom: 2px solid var(--primary-red);
+        }
+
+        /* Hero Section */
+        .hero {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-top: 8px solid var(--primary-red);
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            background-color: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid var(--primary-red);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .feature-card svg {
+            width: 32px;
+            height: 32px;
+            color: var(--primary-red);
+            margin-bottom: 12px;
+        }
+
+        /* Blood Status */
+        .blood-status {
+            background-color: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary-red);
+        }
+        .status-normal { background-color: #ecfdf5; color: #065f46; }
+        .status-moderate { background-color: #fffbeb; border: 2px solid #f59e0b; color: #92400e; }
+        .status-critical { background-color: #fee2e2; border: 2px solid #dc2626; color: var(--primary-red); animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--secondary-gray);
+            color: #d1d5db;
+            padding: 32px 16px;
+            margin-top: 40px;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 767px) {
+            .md\\:hidden { display: none; }
+            .mobile-menu-btn {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                color: var(--secondary-gray);
+                cursor: pointer;
+            }
+            nav {
+                display: none;
+                flex-direction: column;
+                background: white;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                padding: 16px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+            nav.active {
+                display: flex;
+            }
+            nav a {
+                padding: 12px 0;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            .hero {
+                flex-direction: column;
+            }
+            .hero img {
+                order: -1;
+            }
+        }
+        @media (min-width: 768px) {
+            .mobile-menu-btn { display: none; }
+            nav { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header & Navigation -->
+    <header>
+        <div class="container flex items-center justify-between py-4">
+            <h1 class="text-2xl font-extrabold text-primary-red flex items-center">
+                <svg class="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                LifeDrop
+            </h1>
+            <button class="mobile-menu-btn">☰</button>
+            <nav class="space-x-6 items-center md:flex gap-4">
+                <a href="#" data-view="home" class="active">Home</a>
+                <a href="#" data-view="donor-benefits">For Donors</a>
+                <a href="#" data-view="recipient-search">Need Blood</a>
+                <a href="#" data-view="info-camps">Camps & Info</a>
+                <button class="px-4 py-2 bg-primary-red text-white rounded-lg shadow-lg hover-bg-red transition transform hover-scale text-sm font-semibold">
+                    Login / Register
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <div class="container py-10">
+
+            <!-- Home Section -->
+            <section id="home" class="space-y-12">
+
+                <!-- Hero -->
+                <div class="hero md:flex md:flex-row-reverse items-center">
+                    <div class="md:w-1/2 p-4">
+                        <img src="/2.jpg" 
+                             alt="Hands holding a heart, symbolizing care and community responsibility (SRS 2.3)">
+                    </div>
+                    <div class="md:w-1/2 p-8 md:p-12 space-y-6">
+                        <p class="text-primary-red font-bold text-lg mb-2 uppercase tracking-wider">Save Lives Today</p>
+                        <h2 class="text-4xl md:text-5xl font-extrabold text-secondary-gray leading-tight">
+                            The Centralized Platform for <span class="text-primary-red">Life-Saving Matches.</span>
+                        </h2>
+                        <p class="text-lg text-gray-600">
+                            We connect <strong>eligible donors</strong> with <strong>hospitals and recipients</strong> in need, ensuring timely and accessible blood availability across the region (SRS 1.2 Scope).
+                        </p>
+                        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                            <button onclick="showView('donor-benefits')" class="btn btn-primary font-bold rounded-full shadow-lg transform hover-scale">
+                                Donate Blood, Save a Life
+                            </button>
+                            <button onclick="showView('recipient-search')" class="btn btn-secondary font-bold rounded-full shadow-lg transform hover-scale">
+                                Need Blood? Search Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Features -->
+                <div class="py-10">
+                    <h3 class="text-3xl font-bold text-center text-secondary-gray mb-10">Why Choose LifeDrop?</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="feature-card">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            <p class="text-xl font-semibold text-secondary-gray">Real-Time Search</p>
+                            <p class="text-gray-500 text-sm">Find available blood units or eligible donors instantly by blood group and location. Includes <strong>Priority/Emergency Matching</strong>.</p>
+                        </div>
+                        <div class="feature-card">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 18h-2M4 11h16M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"></path></svg>
+                            <p class="text-xl font-semibold text-secondary-gray">Easy Scheduling</p>
+                            <p class="text-gray-500 text-sm">Book and manage your next donation appointment online and receive timely <strong>SMS/email reminders</strong> (SRS 4.7).</p>
+                        </div>
+                        <div class="feature-card">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.247m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.247"></path></svg>
+                            <p class="text-xl font-semibold text-secondary-gray">Full Awareness</p>
+                            <p class="text-gray-500 text-sm">Access essential information on eligibility, health benefits, and donation safety. <strong>Track donation history</strong> and impact.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blood Status -->
+                <div class="blood-status">
+                    <h3 class="text-2xl font-bold text-secondary-gray mb-6">Current National Blood Status (SRS 4.9 Reports)</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                        <div class="p-4 rounded-lg status-normal">
+                            <p class="text-2xl font-extrabold text-green-600">A+</p>
+                            <p class="text-sm text-gray-500">Normal</p>
+                        </div>
+                        <div class="p-4 rounded-lg status-moderate">
+                            <p class="text-2xl font-extrabold text-yellow-600">B-</p>
+                            <p class="text-sm font-semibold">Moderate Shortage</p>
+                        </div>
+                        <div class="p-4 rounded-lg status-critical">
+                            <p class="text-2xl font-extrabold text-primary-red">O-</p>
+                            <p class="text-sm font-semibold">CRITICAL NEED</p>
+                        </div>
+                        <div class="p-4 rounded-lg status-normal">
+                            <p class="text-2xl font-extrabold text-o-plus">O+</p>
+                            <p class="text-sm text-gray-500">Good Stock</p>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-sm text-gray-500 text-center">Your donation helps move a critical status to a normal one. Check your eligibility now.</p>
+                </div>
+            </section>
+
+            <!-- Donor Benefits -->
+            <section id="donor-benefits" class="hidden space-y-8">
+                <h2 class="text-4xl font-extrabold text-secondary-gray border-b pb-4 mb-8">Why Donate? The Benefits for You </h2>
+
+                <div class="bg-white p-8 rounded-xl shadow-xl flex justify-center items-center space-y-6 md:space-y-0 md:space-x-8">
+                    <div class="md:w-1/2 justify-center">
+                        <img src="/3.jpg" alt="Person donating blood">
+                    </div>
+                    <div class="md:w-1/2 space-y-4">
+                        <p class="text-2xl font-bold text-primary-red mb-4">Your Contribution, Your Rewards:</p>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="pt-1">
+                                <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.24l-1.427-1.426a4.2 4.2 0 00-5.94 0L4 16.59V20h3.41L18.68 7.32a4.2 4.2 0 000-5.94z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-secondary-gray">Health Screening Check</h4>
+                                <p class="text-sm text-gray-500">Every donation includes a free, quick check of your essential health vitals (2.1.2).</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="pt-1">
+                                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-secondary-gray">Personalized Reminders</h4>
+                                <p class="text-sm text-gray-500">Track history and get notifications when eligible again (2.1.3, 4.7).</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="pt-1">
+                                <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856a2 2 0 001.789-2.893l-6.929-11.667a2 2 0 00-3.578 0l-6.93 11.667a2 2 0 001.789 2.893z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-secondary-gray">Emergency Call Alerts</h4>
+                                <p class="text-sm text-gray-500">Be notified first if your blood type is needed locally (2.1.5).</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-4">
+                            <button onclick="showView('info-camps')" class="btn btn-primary font-bold rounded-lg shadow-lg transform hover-scale">
+                                Locate Nearest Donation Camp (2.1.4)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointment Form -->
+                <div class="mt-12 bg-gray-100 p-8 rounded-xl shadow-inner border border-gray-200">
+                    <h3 class="text-2xl font-bold text-secondary-gray mb-6">Schedule Your Donation Appointment</h3>
+                    <form id="appointmentForm" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="donorName">Full Name</label>
+                            <input type="text" id="donorName" required>
+                        </div>
+                        <div>
+                            <label for="donorBloodGroup">Blood Group</label>
+                            <select id="donorBloodGroup" required>
+                                <option value="">Select Group</option>
+                                <option value="A_POS">A+</option>
+                                <option value="A_NEG">A-</option>
+                                <option value="B_POS">B+</option>
+                                <option value="B_NEG">B-</option>
+                                <option value="O_POS">O+</option>
+                                <option value="O_NEG">O-</option>
+                                <option value="AB_POS">AB+</option>
+                                <option value="AB_NEG">AB-</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="donationDate">Preferred Date</label>
+                            <input type="date" id="donationDate" required>
+                        </div>
+                        <div class="md:col-span-3 pt-4">
+                            <button type="submit" class="w-full py-3 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700 transition transform hover-scale">
+                                Book Appointment
+                            </button>
+                        </div>
+                    </form>
+                    <div id="appointmentMessage"></div>
+                </div>
+            </section>
+
+            <!-- Recipient Search -->
+            <section id="recipient-search" class="hidden space-y-8">
+                <h2 class="text-4xl font-extrabold text-secondary-gray border-b pb-4 mb-8">Blood Search & Request (SRS 4.3, 4.6)</h2>
+
+                <div class="bg-white p-8 rounded-xl shadow-xl space-y-6">
+                    <p class="text-gray-600">Use the real-time search engine to locate available blood units in nearby hospitals or connect directly with eligible individual donors.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                        <div class="md:col-span-1">
+                            <label for="bloodGroup">Required Blood Group</label>
+                            <select id="bloodGroup">
+                                <option value="">Select Group*</option>
+                                <option value="A_POS">A+</option>
+                                <option value="A_NEG">A-</option>
+                                <option value="B_POS">B+</option>
+                                <option value="B_NEG">B-</option>
+                                <option value="O_POS">O+</option>
+                                <option value="O_NEG">O-</option>
+                                <option value="AB_POS">AB+</option>
+                                <option value="AB_NEG">AB-</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="location">City / Pin Code (4.6)</label>
+                            <input type="text" id="location" placeholder="e.g., Mumbai, 400001">
+                        </div>
+                        <div class="md:col-span-1">
+                            <button id="searchBtn" class="w-full py-3 bg-primary-red text-white font-bold rounded-lg shadow-md hover-bg-red transition">
+                                Search Blood
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="searchResults">
+                    <div class="p-6 bg-gray-100 border border-gray-200 rounded-xl shadow-inner text-gray-600">
+                        <p class="font-semibold">Your search results will appear here.</p>
+                        <p class="text-sm mt-1">For urgent needs, select O- to simulate the emergency alert system.</p>
+                    </div>
+                </div>
+
+                <div class="bg-red-50 p-8 rounded-xl shadow-lg border-l-4 border-primary-red">
+                    <h3 class="text-2xl font-bold text-primary-red mb-4 flex items-center">
+                        Immediate Emergency Request
+                    </h3>
+                    <p class="text-gray-600 mb-4">If the need is immediate, you can post a request. This triggers the <strong>Notification System</strong> to alert nearby eligible donors.</p>
+                    <button class="btn btn-primary font-bold rounded-lg shadow-md transform hover-scale">
+                        Post Emergency Blood Request
+                    </button>
+                </div>
+            </section>
+
+            <!-- Camps & Info -->
+            <section id="info-camps" class="hidden space-y-8">
+                <h2 class="text-4xl font-extrabold text-secondary-gray border-b pb-4 mb-8">Upcoming Camps & Education (SRS 4.2)</h2>
+
+                <div class="bg-white p-8 rounded-xl shadow-xl space-y-6">
+                    <h3 class="text-2xl font-bold text-primary-red">Donor Eligibility & Process FAQ</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-secondary-gray">Who can donate?</h4>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1 text-sm pl-4">
+                                <li>Generally healthy individuals.</li>
+                                <li>Age 18 to 65 years.</li>
+                                <li>Weight above 50 kg.</li>
+                                <li>Must not have donated in the last 90-112 days.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-secondary-gray">What is the process?</h4>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1 text-sm pl-4">
+                                <li><strong>Registration:</strong> Quick sign-up.</li>
+                                <li><strong>Health Check:</strong> Mini-physical exam.</li>
+                                <li><strong>Donation:</strong> Takes about 8-10 minutes.</li>
+                                <li><strong>Recovery:</strong> 10-15 minutes rest with refreshments.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-100 p-8 rounded-xl shadow-inner border border-gray-200">
+                    <h3 class="text-2xl font-bold text-secondary-gray mb-6">Nearby Donation Camps</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-green-500 flex justify-between items-center">
+                            <div>
+                                <p class="font-bold text-lg text-secondary-gray">Community Drive - City Center</p>
+                                <p class="text-sm text-gray-600">Date: Saturday, Oct 26th | Time: 9:00 AM - 3:00 PM</p>
+                                <p class="text-xs text-gray-500">Location: Municipal Hall, 1st Floor</p>
+                            </div>
+                            <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm">View Map</button>
+                        </div>
+                        <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-blue-500 flex justify-between items-center">
+                            <div>
+                                <p class="font-bold text-lg text-secondary-gray">University Campus Blood Drive</p>
+                                <p class="text-sm text-gray-600">Date: Friday, Nov 1st | Time: 10:00 AM - 4:00 PM</p>
+                                <p class="text-xs text-gray-500">Location: Student Union Building</p>
+                            </div>
+                            <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm">View Map</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center space-y-4">
+            <p>LifeDrop Platform | SRS Compliance Project (1.2)</p>
+            <p>Security Notice: All data transmitted is protected by <strong>SSL/HTTPS encryption</strong> (5.4) and complies with health data privacy regulations (5.8).</p>
+            <p>&copy; 2024 LifeDrop. Promoting Social Responsibility (2.3).</p>
+        </div>
+    </footer>
+
+    <script>
+        const views = ['home', 'donor-benefits', 'recipient-search', 'info-camps'];
+        let currentView = 'home';
+
+        function showView(viewId) {
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(viewId);
+            if (target) {
+                target.classList.remove('hidden');
+                currentView = viewId;
+            }
+
+            document.querySelectorAll('nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-view') === viewId) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        function handleSearch() {
+            const bloodGroup = document.getElementById('bloodGroup').value;
+            const location = document.getElementById('location').value;
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!bloodGroup) {
+                resultsDiv.innerHTML = `<div class="p-4 bg-red-100 text-red-800 rounded-lg shadow-inner mt-6">Please select a required blood group.</div>`;
+                return;
+            }
+
+            let emergency = '';
+            if (bloodGroup === 'O_NEG') {
+                emergency = `
+                    <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200 flex justify-between items-center mt-4">
+                        <div>
+                            <p class="font-semibold text-yellow-700">Emergency Alert triggered for O- (Priority Matching)</p>
+                            <p class="text-sm text-gray-500">Contacting 15 eligible local donors now (SRS 4.7).</p>
+                        </div>
+                        <span class="text-sm text-yellow-600 font-semibold">Active</span>
+                    </div>
+                `;
+            }
+
+            resultsDiv.innerHTML = `
+                <div class="p-6 bg-white border border-gray-200 rounded-xl shadow-lg mt-8 space-y-4">
+                    <p class="text-xl font-bold text-secondary-gray">Real-Time Search Results (Mock Data)</p>
+                    <p class="text-sm text-gray-500">
+                        Searching for: <span class="font-bold text-primary-red">${bloodGroup}</span> in <span class="font-bold">${location || 'All Locations'}</span>. (Simulating SRS 4.6)
+                    </p>
+                    <div class="space-y-3">
+                        <div class="p-4 bg-green-50 rounded-lg border border-green-200 flex justify-between items-center">
+                            <div>
+                                <p class="font-semibold text-green-700">Blood Bank Central</p>
+                                <p class="text-sm text-gray-500">Available: <span class="font-bold text-green-600">3 Units</span> of ${bloodGroup}</p>
+                            </div>
+                            <button class="px-3 py-1 bg-primary-red text-white rounded-md hover-bg-red text-sm">Contact</button>
+                        </div>
+                        <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 flex justify-between items-center">
+                            <div>
+                                <p class="font-semibold text-blue-700">Individual Donor: S. Patel</p>
+                                <p class="text-sm text-gray-500">Last donated 4 months ago. Eligible.</p>
+                            </div>
+                            <button class="px-3 py-1 bg-primary-red text-white rounded-md hover-bg-red text-sm">Request Contact (4.3)</button>
+                        </div>
+                        ${emergency}
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleAppointment(e) {
+            e.preventDefault();
+            const name = document.getElementById('donorName').value;
+            const date = document.getElementById('donationDate').value;
+            const bloodGroup = document.getElementById('donorBloodGroup').value;
+            const msg = document.getElementById('appointmentMessage');
+
+            if (!name || !date || !bloodGroup) {
+                msg.innerHTML = `<div class="p-4 bg-red-100 text-red-800 rounded-lg shadow-inner mt-4">Please fill out all required fields.</div>`;
+                return;
+            }
+
+            msg.innerHTML = `
+                <div class="p-4 bg-green-100 text-green-800 rounded-lg shadow-inner mt-4 border-l-4 border-green-500">
+                    <p class="font-bold text-lg">Appointment Confirmed!</p>
+                    <p class="mt-1 text-sm">Thank you, <span class="font-semibold">${name}</span> (Blood Group: ${bloodGroup}).</p>
+                    <p class="mt-1 text-sm">Your appointment is scheduled for <span class="font-semibold">${date}</span>.</p>
+                    <p class="mt-2 text-xs text-green-700">A reminder SMS/Email will be sent 7 days before the date. (SRS 4.7)</p>
+                </div>
+            `;
+            document.getElementById('appointmentForm').reset();
+        }
+
+        // Mobile menu
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+            document.querySelector('nav').classList.toggle('active');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showView('home');
+            
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const viewId = e.target.getAttribute('data-view');
+                    if (viewId) showView(viewId);
+                });
+            });
+
+            const searchBtn = document.getElementById('searchBtn');
+            if (searchBtn) searchBtn.addEventListener('click', handleSearch);
+
+            const appointmentForm = document.getElementById('appointmentForm');
+            if (appointmentForm) appointmentForm.addEventListener('submit', handleAppointment);
+        });
+    </script>
+</body>
+</html>
